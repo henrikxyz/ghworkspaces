@@ -1,0 +1,31 @@
+name: Windows Remote Desktop
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Select Windows Runner Specification'
+        required: true
+        default: 'windows-latest'
+        type: choice
+        options:
+          - 'windows-latest'
+          - 'windows-2025'
+          - 'windows-2025-vs2026'
+          - 'windows-2022'
+          - 'windows-11-arm'
+          - 'windows-11-vs2026-arm'
+
+jobs:
+  secure-rdp:
+    name: Build Windows Remote Desktop (${{ github.event.inputs.runner }})
+    runs-on: ${{ github.event.inputs.runner }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Windows Remote Environment
+        env:
+          TS_KEY: ${{ secrets.TS_KEY }}
+          VNC_USER_PASSWORD: ${{ secrets.VNC_USER_PASSWORD }}
+        run: |
+          powershell -File scripts/setup_windows.ps1

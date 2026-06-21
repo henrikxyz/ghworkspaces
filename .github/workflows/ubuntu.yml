@@ -1,0 +1,37 @@
+name: Ubuntu Development Server
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Select Ubuntu Runner Specification'
+        required: true
+        default: 'ubuntu-latest'
+        type: choice
+        options:
+          - 'ubuntu-latest'
+          - 'ubuntu-24.04'
+          - 'ubuntu-24.04-arm'
+          - 'ubuntu-22.04'
+          - 'ubuntu-22.04-arm'
+          - 'ubuntu-26.04'
+          - 'ubuntu-26.04-arm'
+          - 'ubuntu-slim'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: Build Ubuntu Development Server (${{ github.event.inputs.runner }})
+    runs-on: ${{ github.event.inputs.runner }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Ubuntu Remote Environment
+        env:
+          TS_KEY: ${{ secrets.TS_KEY }}
+          VNC_USER_PASSWORD: ${{ secrets.VNC_USER_PASSWORD }}
+          VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
+        run: bash scripts/setup_ubuntu.sh "$VNC_USER_PASSWORD" "$VNC_PASSWORD" "$TS_KEY"
